@@ -17,7 +17,6 @@ type (
 )
 
 func main() {
-
 	if os.Getenv("DB_HOST") == "" {
 		panic(errors.New("DB_HOST needs to be set"))
 	}
@@ -53,11 +52,11 @@ func main() {
 }
 
 func (m *Monitor) sync() error {
-	println("syncing")
+	// Alert on block misses
 	var misses []*types.MissInfo
 	err := m.db.Model(&types.MissInfo{}).Where("alerted = FALSE").Select(&misses)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	for _, miss := range misses {
 		raven.CaptureError(errors.New("Missed block"), map[string]string{"height": strconv.FormatInt(miss.Height, 10), "time": miss.Time.String(), "address": miss.Address})
@@ -68,10 +67,11 @@ func (m *Monitor) sync() error {
 		}
 	}
 
+	// Alert on proposals
 	var proposals []*types.Proposal
 	err = m.db.Model(&types.Proposal{}).Where("alerted = FALSE").Select(&proposals)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	for _, proposal := range proposals {
 		if proposal.ProposalStatus == "Passed" || proposal.ProposalStatus == "Rejected" {
