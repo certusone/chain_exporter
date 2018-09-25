@@ -106,13 +106,13 @@ func createSchema(db *pg.DB) error {
 }
 
 func (m *Monitor) sync() error {
-	for name, cl := range m.clients {
-		go func() {
-			err := m.captureNetData(cl, name)
+	for name := range m.clients {
+		go func(n string, client *client.HTTP) {
+			err := m.captureNetData(client, n)
 			if err != nil {
 				fmt.Printf("error parsing netData: %v\n", err)
 			}
-		}()
+		}(name, m.clients[name])
 	}
 	return nil
 }
