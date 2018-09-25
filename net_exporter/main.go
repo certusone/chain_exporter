@@ -124,9 +124,10 @@ func (m *Monitor) captureNetData(client *client.HTTP, name string) error {
 		return err
 	}
 
+	timestamp := time.Now()
 	for _, peer := range netInfo.Peers {
 		data := &PeerInfo{}
-		data.Timestamp = time.Now()
+		data.Timestamp = timestamp
 		data.Node = name
 
 		data.Channels = peer.Channels.String()
