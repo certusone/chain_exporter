@@ -18,11 +18,12 @@ type (
 	}
 
 	MissInfo struct {
-		ID      int64
-		Address string
-		Height  int64
-		Alerted bool `sql:",default:false,notnull"`
-		Time    time.Time
+		ID       int64
+		Address  string
+		Height   int64
+		Alerted  bool `sql:",default:false,notnull"`
+		Proposer string
+		Time     time.Time
 	}
 
 	Proposal struct {

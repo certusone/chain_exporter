@@ -142,10 +142,11 @@ func (m *Monitor) ingestBlock(height int64) error {
 	for i, validator := range validators.Validators {
 		if nextBlock.Block.LastCommit.Precommits[i] == nil {
 			missed := &ctypes.MissInfo{
-				Height:  block.BlockMeta.Header.Height,
-				Address: validator.Address.String(),
-				Alerted: false,
-				Time:    block.BlockMeta.Header.Time,
+				Height:   block.BlockMeta.Header.Height,
+				Address:  validator.Address.String(),
+				Alerted:  false,
+				Time:     block.BlockMeta.Header.Time,
+				Proposer: block.BlockMeta.Header.ProposerAddress.String(),
 			}
 			missedValidators = append(missedValidators, missed)
 			continue
