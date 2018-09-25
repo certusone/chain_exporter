@@ -56,7 +56,7 @@ func main() {
 		for {
 			err = monitor.sync()
 			if err != nil {
-				panic(err)
+				fmt.Printf("error syncing: %v\n", err)
 			}
 			time.Sleep(time.Second)
 		}
@@ -64,10 +64,10 @@ func main() {
 
 	for {
 		select {
-		case <-time.Tick(time.Second):
+		case <-time.Tick(10 * time.Second):
 			err := monitor.getGovernance()
 			if err != nil {
-				panic(err)
+				fmt.Printf("error parsing governance: %v\n", err)
 			}
 		}
 	}
