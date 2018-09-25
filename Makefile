@@ -5,3 +5,4 @@ get_vendor_deps:
 install:
 	go install ./
 	go install ./alerter
+	go install ./net_exporter
