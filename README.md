@@ -38,4 +38,5 @@ Environment:
 "DB_USER" = "postgres" # DB username
 "DB_PW"= "mypwd" # DB password
 "RAVEN_DSN" = "http://xxxxxxx" # DSN_URL from Sentry (hosted or self-hosted)
+"ADDRESS" = "ABCDDED" # Address of the validator to alert on
 ```

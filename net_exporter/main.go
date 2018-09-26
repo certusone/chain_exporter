@@ -2,14 +2,14 @@ package main
 
 import (
 	"fmt"
+	"github.com/certusone/chain_exporter/types"
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 	"github.com/pkg/errors"
-	"github.com/tendermint/tendermint/libs/flowrate"
-	"github.com/tendermint/tendermint/p2p/conn"
 	"github.com/tendermint/tendermint/rpc/client"
 	"net/url"
 	"os"
+	"os/signal"
 	"strconv"
 	"strings"
 	"time"
@@ -19,24 +19,6 @@ type (
 	Monitor struct {
 		db      *pg.DB
 		clients map[string]*client.HTTP
-	}
-
-	PeerInfo struct {
-		ID        int64
-		Timestamp time.Time
-		Node      string
-
-		PeerID     string `json:"id"`
-		ListenAddr string `json:"listen_addr"`
-		Network    string `json:"network"`
-		Version    string `json:"version"`
-		Channels   string `json:"channels"`
-		Moniker    string `json:"moniker"`
-		IsOutbound bool   `json:"is_outbound"`
-
-		SendData    flowrate.Status
-		RecvData    flowrate.Status
-		ChannelData []conn.ChannelStatus
 	}
 )
 
@@ -60,6 +42,7 @@ func main() {
 		panic(errors.New("PERIOD needs to be a number"))
 	}
 
+	// Setup the RPC clients
 	clients := make(map[string]*client.HTTP)
 	for _, item := range strings.Split(os.Getenv("GAIA_URLS"), ",") {
 		tClient := client.NewHTTP(item, "/websocket")
@@ -71,6 +54,7 @@ func main() {
 		clients[hostname.Host] = tClient
 	}
 
+	// Connect to the postgres datastore
 	db := pg.Connect(&pg.Options{
 		Addr:     os.Getenv("DB_HOST"),
 		User:     os.Getenv("DB_USER"),
@@ -78,25 +62,32 @@ func main() {
 	})
 	defer db.Close()
 
-	err := createSchema(db)
-	if err != nil {
-		//panic(err)
-	}
+	// Setup the database and ignore errors if the schema already exists
+	CreateSchema(db)
+
+	// Setup monitor
 	monitor := &Monitor{db, clients}
+	// Parse query period
 	period, _ := strconv.Atoi(os.Getenv("PERIOD"))
+
+	// Allow graceful closing of the process
+	signalCh := make(chan os.Signal, 1)
+	signal.Notify(signalCh, os.Interrupt)
+
+	// Start the periodic syncing
 	for {
 		select {
 		case <-time.Tick(time.Duration(period) * time.Second):
-			err := monitor.sync()
-			if err != nil {
-				fmt.Printf("error parsing governance: %v\n", err)
-			}
+			monitor.Sync()
+		case <-signalCh:
+			return
 		}
 	}
 }
 
-func createSchema(db *pg.DB) error {
-	for _, model := range []interface{}{(*PeerInfo)(nil)} {
+// CreateSchema sets up the database using the ORM
+func CreateSchema(db *pg.DB) error {
+	for _, model := range []interface{}{(*types.PeerInfo)(nil)} {
 		err := db.CreateTable(model, &orm.CreateTableOptions{})
 		if err != nil {
 			return err
@@ -105,28 +96,34 @@ func createSchema(db *pg.DB) error {
 	return nil
 }
 
-func (m *Monitor) sync() error {
+// Sync queries and stores the netdata for each node listed
+func (m *Monitor) Sync() {
 	for name := range m.clients {
 		go func(n string, client *client.HTTP) {
-			err := m.captureNetData(client, n)
+			err := m.CaptureNetData(client, n)
 			if err != nil {
-				fmt.Printf("error parsing netData: %v\n", err)
+				fmt.Printf("error parsing netData for %s: %v\n", name, err)
+				return
 			}
+			fmt.Printf("parsed netData for %s\n", name)
+
 		}(name, m.clients[name])
 	}
-	return nil
 }
 
-func (m *Monitor) captureNetData(client *client.HTTP, name string) error {
+// CaptureNetData queries a node's net_info and stores the information for each peer in the db
+func (m *Monitor) CaptureNetData(client *client.HTTP, name string) error {
 	// Get Data
 	netInfo, err := client.NetInfo()
 	if err != nil {
 		return err
 	}
 
+	// Use one timestamp to allow grouping
 	timestamp := time.Now()
 	for _, peer := range netInfo.Peers {
-		data := &PeerInfo{}
+		// Aggregate data
+		data := &types.PeerInfo{}
 		data.Timestamp = timestamp
 		data.Node = name
 
@@ -142,6 +139,7 @@ func (m *Monitor) captureNetData(client *client.HTTP, name string) error {
 		data.RecvData = peer.ConnectionStatus.RecvMonitor
 		data.ChannelData = peer.ConnectionStatus.Channels
 
+		// Store data in postgres
 		_, err = m.db.Model(data).Insert()
 		if err != nil {
 			fmt.Printf("error inserting netData: %v\n", err)

@@ -1,6 +1,8 @@
 package types
 
 import (
+	"github.com/tendermint/tendermint/libs/flowrate"
+	"github.com/tendermint/tendermint/p2p/conn"
 	"time"
 )
 
@@ -45,5 +47,23 @@ type (
 			SubmitBlock      int64  `json:"submit_block,string"`
 			VotingStartBlock string `json:"voting_start_block"`
 		} `json:"value"`
+	}
+
+	PeerInfo struct {
+		ID        int64
+		Timestamp time.Time
+		Node      string
+
+		PeerID     string `json:"id"`
+		ListenAddr string `json:"listen_addr"`
+		Network    string `json:"network"`
+		Version    string `json:"version"`
+		Channels   string `json:"channels"`
+		Moniker    string `json:"moniker"`
+		IsOutbound bool   `json:"is_outbound";sql:",default:false,notnull"`
+
+		SendData    flowrate.Status
+		RecvData    flowrate.Status
+		ChannelData []conn.ChannelStatus
 	}
 )
