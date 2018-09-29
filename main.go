@@ -49,7 +49,10 @@ func main() {
 	defer db.Close()
 
 	// Setup the database and ignore errors if the schema already exists
-	CreateSchema(db)
+	err := CreateSchema(db)
+	if err != nil {
+		panic(err)
+	}
 
 	// Configure resty
 	resty.SetTimeout(5 * time.Second)
@@ -93,7 +96,7 @@ func main() {
 // CreateSchema sets up the database using the ORM
 func CreateSchema(db *pg.DB) error {
 	for _, model := range []interface{}{(*ctypes.BlockInfo)(nil), (*ctypes.EvidenceInfo)(nil), (*ctypes.MissInfo)(nil), (*ctypes.Proposal)(nil)} {
-		err := db.CreateTable(model, &orm.CreateTableOptions{})
+		err := db.CreateTable(model, &orm.CreateTableOptions{IfNotExists: true})
 		if err != nil {
 			return err
 		}

@@ -63,7 +63,10 @@ func main() {
 	defer db.Close()
 
 	// Setup the database and ignore errors if the schema already exists
-	CreateSchema(db)
+	err := CreateSchema(db)
+	if err != nil {
+		panic(err)
+	}
 
 	// Setup monitor
 	monitor := &Monitor{db, clients}
@@ -88,7 +91,7 @@ func main() {
 // CreateSchema sets up the database using the ORM
 func CreateSchema(db *pg.DB) error {
 	for _, model := range []interface{}{(*types.PeerInfo)(nil)} {
-		err := db.CreateTable(model, &orm.CreateTableOptions{})
+		err := db.CreateTable(model, &orm.CreateTableOptions{IfNotExists: true})
 		if err != nil {
 			return err
 		}
