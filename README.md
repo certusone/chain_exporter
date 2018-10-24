@@ -1,5 +1,8 @@
 # chain_exporter
-Metrics exporter and alerter tools for cosmos-sdk
+Metrics exporter and alerter tools for cosmos-sdk.
+
+[Subscribe to our newsletter](https://mailchi.mp/38ac109a9ab2/certusone) for updates on this project,
+insights on the upcoming Game of Stakes and more.
 
 ## chain_exporter
 
