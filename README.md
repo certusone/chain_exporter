@@ -12,6 +12,7 @@ Environment:
 ```
 "GAIA_URL" = "http://gaia-node1:26657" # gaia URL
 "DB_HOST" = "postgres-chain:5432" # Postgres host:port
+"DB_NAME" = "postgres" # DB name
 "DB_USER" = "postgres" # DB username
 "DB_PW"= "mypwd" # DB password
 "LCD_URL" = "https://gaia-lcd:1317" # gaia lcd URL
@@ -26,6 +27,7 @@ Environment:
 ```
 "GAIA_URLs" = "http://gaia-node0:26657,http://gaia-node1:26657" # gaia URLs (comma-separated)
 "DB_HOST" = "postgres-chain:5432" # Postgres host:port
+"DB_NAME" = "postgres" # DB name
 "DB_USER" = "postgres" # DB username
 "DB_PW"= "mypwd" # DB password
 "PERIOD" = "10" # Period to save data in seconds
@@ -39,6 +41,7 @@ Environment:
 ```
 "DB_HOST" = "postgres-chain:5432" # Postgres host:port
 "DB_USER" = "postgres" # DB username
+"DB_NAME" = "postgres" # DB name
 "DB_PW"= "mypwd" # DB password
 "RAVEN_DSN" = "http://xxxxxxx" # DSN_URL from Sentry (hosted or self-hosted)
 "ADDRESS" = "ABCDDED" # Address of the validator to alert on
