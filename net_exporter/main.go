@@ -29,9 +29,6 @@ func main() {
 	if os.Getenv("DB_HOST") == "" {
 		panic(errors.New("DB_HOST needs to be set"))
 	}
-	if os.Getenv("DB_NAME") == "" {
-		panic(errors.New("DB_NAME needs to be set"))
-	}
 	if os.Getenv("DB_USER") == "" {
 		panic(errors.New("DB_USER needs to be set"))
 	}
@@ -60,7 +57,6 @@ func main() {
 	// Connect to the postgres datastore
 	db := pg.Connect(&pg.Options{
 		Addr:     os.Getenv("DB_HOST"),
-		Database: os.Getenv("DB_NAME"),
 		User:     os.Getenv("DB_USER"),
 		Password: os.Getenv("DB_PW"),
 	})
@@ -134,12 +130,12 @@ func (m *Monitor) CaptureNetData(client *client.HTTP, name string) error {
 		data.Timestamp = timestamp
 		data.Node = name
 
-		data.Channels = peer.Channels.String()
-		data.PeerID = string(peer.ID)
-		data.ListenAddr = peer.ListenAddr
-		data.Network = peer.Network
-		data.Version = peer.Version
-		data.Moniker = peer.Moniker
+		data.Channels = peer.NodeInfo.Channels.String()
+		data.PeerID = string(peer.NodeInfo.ID())
+		data.ListenAddr = peer.NodeInfo.ListenAddr
+		data.Network = peer.NodeInfo.Network
+		data.Version = peer.NodeInfo.Version
+		data.Moniker = peer.NodeInfo.Moniker
 		data.IsOutbound = peer.IsOutbound
 
 		data.SendData = peer.ConnectionStatus.SendMonitor

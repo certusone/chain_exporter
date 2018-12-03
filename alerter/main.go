@@ -23,9 +23,6 @@ func main() {
 	if os.Getenv("DB_HOST") == "" {
 		panic(errors.New("DB_HOST needs to be set"))
 	}
-	if os.Getenv("DB_NAME") == "" {
-		panic(errors.New("DB_NAME needs to be set"))
-	}
 	if os.Getenv("DB_USER") == "" {
 		panic(errors.New("DB_USER needs to be set"))
 	}
@@ -45,7 +42,6 @@ func main() {
 	// Connect to the postgres datastore
 	db := pg.Connect(&pg.Options{
 		Addr:     os.Getenv("DB_HOST"),
-		Database: os.Getenv("DB_NAME"),
 		User:     os.Getenv("DB_USER"),
 		Password: os.Getenv("DB_PW"),
 	})
@@ -55,30 +51,23 @@ func main() {
 	monitor := &Monitor{db, os.Getenv("ADDRESS")}
 
 	go func() {
-		for {
-			select {
-			// Check for alert conditions every second
-			case <-time.Tick(time.Second):
-				fmt.Println("start - alerting on misses")
-				err := monitor.AlertMisses()
-				if err != nil {
-					fmt.Printf("error - alerting on misses: %v\n", err)
-				}
-				fmt.Println("finish - alerting on misses")
+		for range time.Tick(time.Second) {
+			fmt.Println("start - alerting on misses")
+			err := monitor.AlertMisses()
+			if err != nil {
+				fmt.Printf("error - alerting on misses: %v\n", err)
 			}
+			fmt.Println("finish - alerting on misses")
 		}
 	}()
 	go func() {
-		for {
-			select {
-			case <-time.Tick(time.Second):
-				fmt.Println("start - alerting on governance")
-				err := monitor.AlertGovernance()
-				if err != nil {
-					fmt.Printf("error - alerting on governance: %v\n", err)
-				}
-				fmt.Println("finish - alerting on governance")
+		for range time.Tick(time.Second) {
+			fmt.Println("start - alerting on governance")
+			err := monitor.AlertGovernance()
+			if err != nil {
+				fmt.Printf("error - alerting on governance: %v\n", err)
 			}
+			fmt.Println("finish - alerting on governance")
 		}
 	}()
 

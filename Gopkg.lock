@@ -26,11 +26,6 @@
   version = "v1.1.1"
 
 [[projects]]
-  name = "github.com/ebuchman/fail-test"
-  packages = ["."]
-  revision = "95f809107225be108efcf10a3509e4ea6ceef3c4"
-
-[[projects]]
   branch = "master"
   name = "github.com/getsentry/raven-go"
   packages = ["."]
@@ -146,9 +141,11 @@
   name = "github.com/prometheus/client_golang"
   packages = [
     "prometheus",
+    "prometheus/internal",
     "prometheus/promhttp"
   ]
-  revision = "ae27198cdd90bf12cd134ad79d1366a6cf49f632"
+  revision = "abad2d1bd44235a26707c172eab6bca5bf2dbad3"
+  version = "v0.9.1"
 
 [[projects]]
   branch = "master"
@@ -183,6 +180,12 @@
   revision = "e2704e165165ec55d062f5919b4b29494e9fa790"
 
 [[projects]]
+  name = "github.com/rs/cors"
+  packages = ["."]
+  revision = "9a47f48565a795472d43519dd49aac781f3034fb"
+  version = "v1.6.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/syndtr/goleveldb"
   packages = [
@@ -207,20 +210,10 @@
   revision = "e5840949ff4fff0c56f9b6a541e22b63581ea9df"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/tendermint/ed25519"
-  packages = [
-    ".",
-    "edwards25519",
-    "extra25519"
-  ]
-  revision = "d8387025d2b9d158cf4efb07e7ebf814bcce2057"
-
-[[projects]]
   name = "github.com/tendermint/go-amino"
   packages = ["."]
-  revision = "faa6e731944e2b7b6a46ad202902851e8ce85bee"
-  version = "v0.12.0"
+  revision = "dc14acf9ef15f85828bfbc561ed9dd9d2a284885"
+  version = "v0.14.1"
 
 [[projects]]
   name = "github.com/tendermint/tendermint"
@@ -247,6 +240,7 @@
     "libs/common",
     "libs/db",
     "libs/events",
+    "libs/fail",
     "libs/flowrate",
     "libs/log",
     "libs/pubsub",
@@ -256,14 +250,12 @@
     "p2p",
     "p2p/conn",
     "p2p/pex",
-    "p2p/upnp",
     "privval",
     "proxy",
     "rpc/client",
     "rpc/core",
     "rpc/core/types",
     "rpc/grpc",
-    "rpc/lib",
     "rpc/lib/client",
     "rpc/lib/server",
     "rpc/lib/types",
@@ -275,8 +267,8 @@
     "types/time",
     "version"
   ]
-  revision = "d419fffe18531317c28c29a292ad7d253f6cafdf"
-  version = "v0.24.0"
+  revision = "44b769b1acd0b2aaa8c199b0885bc2811191fb2e"
+  version = "v0.27.0-dev1"
 
 [[projects]]
   branch = "master"
@@ -285,11 +277,12 @@
   revision = "58bfd21040084b3e377ef748e559e2bd3e7c826e"
 
 [[projects]]
-  branch = "master"
   name = "golang.org/x/crypto"
   packages = [
     "chacha20poly1305",
     "curve25519",
+    "ed25519",
+    "ed25519/internal/edwards25519",
     "hkdf",
     "internal/chacha20",
     "internal/subtle",
@@ -300,7 +293,8 @@
     "ripemd160",
     "salsa20/salsa"
   ]
-  revision = "0e37d006457bf46f9e6692014ba72ef82c33022c"
+  revision = "3764759f34a542a3aef74d6b02e35be7ab893bba"
+  source = "github.com/tendermint/crypto"
 
 [[projects]]
   name = "golang.org/x/net"
@@ -391,6 +385,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ab514f3338aa3bcb40402417543121f6f7dcba16f6908cf92fcc6e5c9eafaf7b"
+  inputs-digest = "53d0d244965fe556de238b836eac5936e34476aee845aa0f5d309161f2646ba3"
   solver-name = "gps-cdcl"
   solver-version = 1
